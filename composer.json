@@ -14,6 +14,7 @@
         "phpunit/phpunit": "^9.6"
     },
     "scripts": {
-        "test": "phpunit --testdox --coverage-html reports --coverage-clover=reports/clover.xml"
+        "coverage": "phpunit --testdox --coverage-html reports --coverage-clover=reports/clover.xml",
+        "test": "phpunit --testdox"
     }
 }
