@@ -4,7 +4,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "yutayamane\\php-ulid\\": "src/"
+            "yutayamane\\": "src/"
         }
     },
     "require": {
@@ -14,6 +14,6 @@
         "phpunit/phpunit": "^9.6"
     },
     "scripts": {
-        "test": "phpunit --testdox --cocverage-html reports --cocverage-clover reports/clover.xml"
+        "test": "phpunit --testdox --coverage-html reports --coverage-clover=reports/clover.xml"
     }
 }
