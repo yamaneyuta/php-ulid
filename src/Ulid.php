@@ -12,9 +12,6 @@ class Ulid {
 
 	public function __construct( array | null $ulid_bytes = null ) {
 
-		// 64bit以上の環境でないと動作しない。
-		assert( PHP_INT_SIZE >= 8, 'Ulid class requires 64bit environment.' );
-
 		if ( is_null( $ulid_bytes ) ) {
 			// 下位10バイトのランダム値に相当する配列を作成
 			$ulid_bytes = unpack( 'C*', random_bytes( 10 ) );
