@@ -1,0 +1,13 @@
+{
+    "name": "yutayamane/php-ulid",
+    "description": "ULID library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "yutayamane\\php-ulid\\": "src/"
+        }
+    },
+    "require": {
+        "php-64bit": ">=7.0"
+    }
+}
