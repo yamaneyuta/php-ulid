@@ -178,6 +178,10 @@ class UlidTest extends TestCase
             ["00000000000000000000000000", true],
             ["7ZZZZZZZZZZZZZZZZZZZZZZZZZ", true], // max
             ["01HVK10KGQMF83JMCQ0KHK5PG6", true],
+            
+            // ULIDは小文字でもOK
+            ["7zzzzzzzzzzzzzzzzzzzzzzzzz", true],
+            ["01hvk10kgqmf83jmcq0khk5pg6", true],
 
             // ULIDは`7ZZZZZZZZZZZZZZZZZZZZZZZZZ`が最大値
             ["80000000000000000000000000", false],

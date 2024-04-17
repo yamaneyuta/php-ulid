@@ -101,7 +101,7 @@ class Ulid {
 
 	private static function fromUlid( string $value ): self {
 
-		$chars = str_split( $value );
+		$chars = str_split( strtoupper( $value ) );
 		$bytes = array();
 		$val   = 0;
 		$bits  = 0;
