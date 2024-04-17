@@ -101,6 +101,12 @@ class Ulid {
 	private static function fromUlid( string $value ): self {
 
 		$chars = str_split( $value );
+
+		// 先頭の文字は7以下であること
+		if( strpos( self::ULID_CHARS, $chars[0] ) > 7 ) {
+			throw new \Exception( 'Invalid ULID format.' );
+		}
+
 		$bytes = array();
 		$val   = 0;
 		$bits  = 0;
@@ -123,6 +129,9 @@ class Ulid {
 	}
 
 	private static function fromUuid( string $value ): self {
+		if( ! preg_match( '/^([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})$/', strtolower($value)) ) {
+			throw new \Exception( 'Invalid UUID format.' );
+		}
 		return self::fromHex( str_replace( '-', '', $value ) );
 	}
 
@@ -131,8 +140,11 @@ class Ulid {
 		if ( 0 === strpos( $value, '0x' ) ) {
 			$value = substr( $value, 2 );
 		}
+		// 32文字未満の場合は32文字になるように0埋め
+		$value = str_pad( $value, 32, '0', STR_PAD_LEFT );
+
 		// フォーマットチェック
-		if ( ! preg_match( '/^[0-9a-fA-F]{0,32}$/', $value ) ) {
+		if ( ! preg_match( '/^[0-9a-f]{32}$/', strtolower($value) ) ) {
 			throw new \Exception( 'Invalid hex format.' );
 		}
 		return new self( array_map( 'ord', str_split( hex2bin( $value ) ) ) );
