@@ -1,10 +1,8 @@
 
 
 
-## php-ulid <img src="https://img.shields.io/badge/PHP-ccc.svg?logo=php&style=flat"> ![License](https://img.shields.io/github/license/yamaneyuta/php-ulid) ![Test](https://github.com/yamaneyuta/php-ulid/actions/workflows/test.yml/badge.svg?branch=main)
+# php-ulid <img src="https://img.shields.io/badge/PHP-ccc.svg?logo=php&style=flat"> ![License](https://img.shields.io/github/license/yamaneyuta/php-ulid) ![Test](https://github.com/yamaneyuta/php-ulid/actions/workflows/test.yml/badge.svg?branch=main)
 
-
-## 概要
 PHPでULID(Universally Unique Lexicographically Sortable Identifier)を生成するためのライブラリです。
 
 UUIDと同じフォーマットでの出力が可能なため、システムへの影響を最小限に、ミリ秒単位でソート可能なIDに置き換えることができます。
