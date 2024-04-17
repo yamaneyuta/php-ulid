@@ -5,7 +5,10 @@
     "autoload": {
         "psr-4": {
             "yutayamane\\": "src/"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     },
     "require": {
         "php-64bit": "^7.1|^8.0"
