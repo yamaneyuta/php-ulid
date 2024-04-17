@@ -13,15 +13,28 @@ class UlidTest extends TestCase
     {
         $ulid = new Ulid();
         
-        // ULID文字列
-        $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', $ulid->toString());
-        $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', (string)$ulid);
+        if(method_exists($this, 'assertMatchesRegularExpression')) {
+            // ULID文字列
+            $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', $ulid->toString());
+            $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', (string)$ulid);
+    
+            // UUID形式で出力
+            $this->assertTrue( $this->isUuidFormat($ulid->toUuid()));
+            
+            // 16進数で出力
+            $this->assertMatchesRegularExpression('/^[0-9a-f]+$/', $ulid->toHex());
+        }
+        else {
+            // ULID文字列
+            $this->assertTrue( preg_match('/^[0-9A-Z]{26}$/', $ulid->toString()) === 1 );
+            $this->assertTrue( preg_match('/^[0-9A-Z]{26}$/', (string)$ulid) === 1 );
 
-        // UUID形式で出力
-        $this->assertTrue( $this->isUuidFormat($ulid->toUuid()));
-        
-        // 16進数で出力
-        $this->assertMatchesRegularExpression('/^[0-9a-f]+$/', $ulid->toHex());
+            // UUID形式で出力
+            $this->assertTrue( $this->isUuidFormat($ulid->toUuid()));
+
+            // 16進数で出力
+            $this->assertTrue( preg_match('/^[0-9a-f]+$/', $ulid->toHex()) === 1 );
+        }
     }
 
     /**
