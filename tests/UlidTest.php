@@ -1,9 +1,40 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
 use yutayamane\Ulid;
 
+use function yutayamane\ulid;
+
 class UlidTest extends TestCase
 {
+    /**
+     * @test
+     * @testdox `ulid()`関数が呼び出されたときに、ULIDフォーマットの文字列が返却されることを確認
+     */
+    public function testUlidFunction(): void
+    {
+        $this->myAssertMatchesRegularExpression('/^[0-9A-Z]{26}$/', ulid());
+    }
+
+    /**
+     * @test
+     * @testdox 何回か`ulid()`関数を呼び出して、生成されるULIDが重複しないことを確認
+     */
+    public function testUlidDuplicate(): void
+    {
+        $ulid_list = array();
+        // 1万回繰り返して重複する値が生成されないことを確認
+        for($i = 0; $i < 10000; $i++) {
+            $ulid_tmp = ulid();
+            if($ulid_list[$ulid_tmp] ?? false) {
+                $this->fail('ULID is duplicated.');
+            }
+            $ulid_list[$ulid_tmp] = true;
+        }
+
+        $this->assertTrue(true);
+    }
+
     /**
      * @test
      * @testdox 出力される文字列のフォーマットチェック
