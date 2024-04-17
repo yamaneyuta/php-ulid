@@ -13,26 +13,28 @@ permissions:
 
 jobs:
   phpunit:
-    name: PHPUnit (PHP ${{ matrix.php-versions }})
+    name: PHPUnit (PHP ${{ matrix.env.php-versions }})
+    runs-on: ${{ matrix.env.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
-        php-versions: [ '7.3', '7.4', '8.0', '8.1', '8.2', '8.3' ]
-        # php-versions: [ '7.3' ]
-        include:
-          - os: ubuntu-20.04
-            php-versions: '7.1'
-          - os: ubuntu-20.04
-            php-versions: '7.2'
-    runs-on: ${{ matrix.os }}
+        env: [
+          { os: ubuntu-20.04, php-versions: '7.1' },
+          { os: ubuntu-20.04, php-versions: '7.2' },
+          { os: ubuntu-22.04, php-versions: '7.3' },
+          { os: ubuntu-22.04, php-versions: '7.4' },
+          { os: ubuntu-22.04, php-versions: '8.0' },
+          { os: ubuntu-22.04, php-versions: '8.1' },
+          { os: ubuntu-22.04, php-versions: '8.2' },
+          { os: ubuntu-latest, php-versions: '8.3' },
+        ]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up PHP ${{ matrix.php-versions }}
+      - name: Set up PHP ${{ matrix.env.php-versions }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.env.php-versions }}
           extensions: curl, zip, dom, mbstring
           coverage: xdebug
 
