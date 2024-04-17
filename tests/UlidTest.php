@@ -15,7 +15,7 @@ class UlidTest extends TestCase
         
         // ULID文字列
         $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', $ulid->toString());
-        $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', "" . $ulid);
+        $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', (string)$ulid);
 
         // UUID形式で出力
         $this->assertTrue( $this->isUuidFormat($ulid->toUuid()));
@@ -84,7 +84,7 @@ class UlidTest extends TestCase
         $ulid = Ulid::from( $uuid_str );
         // ULIDが一致していることを確認
         $this->assertEquals($ulid_str, $ulid->toString());
-        $this->assertEquals($ulid_str, "" . $ulid);
+        $this->assertEquals($ulid_str, (string)$ulid);
 
         // 時間を数値型に変換
         $timestamp = $this->timestampStrToFloat($timestamp_str);
@@ -104,7 +104,7 @@ class UlidTest extends TestCase
         $ulid = Ulid::from( $hex );
         // ULIDが一致していることを確認
         $this->assertEquals($ulid_str, $ulid->toString());
-        $this->assertEquals($ulid_str, "" . $ulid);
+        $this->assertEquals($ulid_str, (string)$ulid);
         // UUIDが一致していることを確認
         $this->assertEquals(strtolower($uuid_str), strtolower($ulid->toUuid()));
     }
