@@ -6,7 +6,8 @@ namespace yutayamane;
 
 class Ulid {
 
-	private array $ulid_bytes;
+	/** @var array */
+	private $ulid_bytes;
 
 	private const ULID_CHARS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
