@@ -14,7 +14,7 @@
         "php-64bit": "^7.1|^8.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0"
     },
     "scripts": {
         "coverage": "rm -rf reports && phpunit --testdox --coverage-html reports --coverage-clover=reports/clover.xml",
