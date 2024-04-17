@@ -122,7 +122,7 @@ class UlidTest extends TestCase
         $this->assertEquals(strtolower($uuid_str), strtolower($ulid->toUuid()));
     }
 
-    public function fromParams(): array {
+    public static function fromParams(): array {
         return [
             // [ ULID文字列, UUID文字列, 時間文字列 ]
             ['01HVK10KGQMF83JMCQ0KHK5PG6', '018EE610-4E17-A3D0-3951-9704E332DA06', '2024-04-16T08:40:12.055Z' ],
@@ -153,7 +153,7 @@ class UlidTest extends TestCase
         }
     }
 
-    public function fromValueUlidParams(): array{
+    public static function fromValueUlidParams(): array{
         // ここでは文字列の長さが26文字のものを対象とする
         return [
             // [ ULID文字列, ULID文字列として有効かどうか ]
@@ -190,7 +190,7 @@ class UlidTest extends TestCase
         }
     }
 
-    public function fromValueUuidParams(): array{
+    public static function fromValueUuidParams(): array{
         // ここでは文字列の長さが36文字のものを対象とする
         return [
             // [ UUID文字列, UUID文字列として有効かどうか ]
@@ -230,7 +230,7 @@ class UlidTest extends TestCase
         }
     }
 
-    public function fromValueHexParams(): array{
+    public static function fromValueHexParams(): array{
         return [
             ["00000000000000000000000000000000", true],
             ["0x00000000000000000000000000000000", true],
