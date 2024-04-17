@@ -10,7 +10,7 @@ class Ulid {
 
 	private const ULID_CHARS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
-	public function __construct( array | null $ulid_bytes = null ) {
+	public function __construct( ?array $ulid_bytes = null ) {
 
 		if ( is_null( $ulid_bytes ) ) {
 			// 下位10バイトのランダム値に相当する配列を作成
@@ -101,12 +101,6 @@ class Ulid {
 	private static function fromUlid( string $value ): self {
 
 		$chars = str_split( $value );
-
-		// 先頭の文字は7以下であること
-		if( strpos( self::ULID_CHARS, $chars[0] ) > 7 ) {
-			throw new \Exception( 'Invalid ULID format.' );
-		}
-
 		$bytes = array();
 		$val   = 0;
 		$bits  = 0;
@@ -123,6 +117,11 @@ class Ulid {
 				$val >>= 8;
 				$bits -= 8;
 			}
+		}
+
+		// ULIDで扱えない範囲の値が指定された場合はエラー
+		if($val > 0) {
+			throw new \Exception( 'Invalid ULID format.' );
 		}
 
 		return new self( $bytes );
