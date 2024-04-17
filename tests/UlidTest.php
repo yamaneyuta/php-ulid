@@ -13,28 +13,15 @@ class UlidTest extends TestCase
     {
         $ulid = new Ulid();
         
-        if(method_exists($this, 'assertMatchesRegularExpression')) {
-            // ULID文字列
-            $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', $ulid->toString());
-            $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', (string)$ulid);
-    
-            // UUID形式で出力
-            $this->assertTrue( $this->isUuidFormat($ulid->toUuid()));
-            
-            // 16進数で出力
-            $this->assertMatchesRegularExpression('/^[0-9a-f]+$/', $ulid->toHex());
-        }
-        else {
-            // ULID文字列
-            $this->assertTrue( preg_match('/^[0-9A-Z]{26}$/', $ulid->toString()) === 1 );
-            $this->assertTrue( preg_match('/^[0-9A-Z]{26}$/', (string)$ulid) === 1 );
+        // ULID文字列
+        $this->myAssertMatchesRegularExpression('/^[0-9A-Z]{26}$/', $ulid->toString());
+        $this->myAssertMatchesRegularExpression('/^[0-9A-Z]{26}$/', (string)$ulid);
 
-            // UUID形式で出力
-            $this->assertTrue( $this->isUuidFormat($ulid->toUuid()));
-
-            // 16進数で出力
-            $this->assertTrue( preg_match('/^[0-9a-f]+$/', $ulid->toHex()) === 1 );
-        }
+        // UUID形式で出力
+        $this->assertTrue( $this->isUuidFormat($ulid->toUuid()));
+        
+        // 16進数で出力
+        $this->myAssertMatchesRegularExpression('/^[0-9a-f]+$/', $ulid->toHex());
     }
 
     /**
@@ -289,4 +276,20 @@ class UlidTest extends TestCase
         return strtotime($timestamp) + (float)("0." . substr($matches[0], 1));
     }
     
+
+    /**
+     * assertMatchesRegularExpressionのラッパー
+     * PHPUnitのバージョンによってはassertMatchesRegularExpressionが存在しないため、その場合はpreg_matchを使って判定します
+     * @param string $pattern 
+     * @param string $string 
+     * @param string $message 
+     */
+    private function myAssertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
+    {
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression($pattern, $string, $message);
+        } else {
+            $this->assertTrue( preg_match($pattern, $string) === 1, $message );
+        }
+    }
 }
