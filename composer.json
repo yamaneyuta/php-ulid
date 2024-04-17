@@ -8,13 +8,14 @@
         }
     },
     "require": {
-        "php-64bit": ">=7.3"
+        "php-64bit": ">=7.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.6"
+        "phpunit/phpunit": "*"
     },
     "scripts": {
         "coverage": "rm -rf reports && phpunit --testdox --coverage-html reports --coverage-clover=reports/clover.xml",
-        "test": "phpunit --testdox"
+        "// PHPのバージョンが7.2以上と7.2未満で分岐": "",
+        "test": "php -r 'exit(PHP_VERSION_ID < 70200 ? 1 : 0);'; if [ $? -eq 0 ]; then phpunit --testdox; else phpunit; fi"
     }
 }
