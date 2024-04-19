@@ -1,0 +1,51 @@
+name: Lint
+
+on:
+  push:
+    # `master`以外のブランチで実行。`master`ブランチは存在しないため、すべてのブランチで実行する。
+    # ※`branches`と`branches-ignore`の併用不可。
+    branches-ignore: [ "master" ]
+  pull_request:
+    branches-ignore: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint (PHP ${{ matrix.env.php-versions }})
+    runs-on: ${{ matrix.env.os }}
+    strategy:
+      matrix:
+        env: [
+          { os: ubuntu-22.04, php-versions: '7.0' },
+          { os: ubuntu-latest, php-versions: '8.3' },
+        ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP ${{ matrix.env.php-versions }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.env.php-versions }}
+          extensions: curl, zip, dom, mbstring
+          coverage: xdebug
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run test suite
+        run: composer run-script lint
