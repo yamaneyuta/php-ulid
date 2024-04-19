@@ -1,10 +1,10 @@
 {
-    "name": "yutayamane/ulid",
+    "name": "yamaneyuta/ulid",
     "description": "ULID library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "yutayamane\\": "src/classes"
+            "yamaneyuta\\": "src/classes"
         },
         "files": [
             "src/functions/ulid.php"

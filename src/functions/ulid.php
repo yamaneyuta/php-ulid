@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace yutayamane;
+namespace yamaneyuta;
 
 /**
  * @return string ULID format.

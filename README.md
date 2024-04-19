@@ -15,14 +15,14 @@ UUIDと同じフォーマットでの出力が可能なため、システムへ�
 
 新しくULIDを生成
 ```php
-use yutayamane\Ulid;
+use yamaneyuta\Ulid;
 
 echo (string)new Ulid(); // 01HVNE93FHMTQ38NSJ81M03H1Y
 ```
 
 他のフォーマットで出力
 ```php
-use yutayamane\Ulid;
+use yamaneyuta\Ulid;
 
 $ulid = new Ulid();
 
