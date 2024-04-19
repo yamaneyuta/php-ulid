@@ -7,6 +7,7 @@ namespace yutayamane;
 /**
  * @return string ULID format.
  */
-function ulid(): string {
+function ulid(): string
+{
     return (string)new Ulid();
 }

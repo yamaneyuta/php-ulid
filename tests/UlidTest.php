@@ -1,9 +1,10 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
-use yutayamane\Ulid;
+declare(strict_types=1);
 
-use function yutayamane\ulid;
+namespace yutayamane;
+
+use PHPUnit\Framework\TestCase;
 
 class UlidTest extends TestCase
 {
@@ -24,9 +25,9 @@ class UlidTest extends TestCase
     {
         $ulid_list = array();
         // 1万回繰り返して重複する値が生成されないことを確認
-        for($i = 0; $i < 10000; $i++) {
+        for ($i = 0; $i < 10000; $i++) {
             $ulid_tmp = ulid();
-            if($ulid_list[$ulid_tmp] ?? false) {
+            if ($ulid_list[$ulid_tmp] ?? false) {
                 $this->fail('ULID is duplicated.');
             }
             $ulid_list[$ulid_tmp] = true;
@@ -43,14 +44,14 @@ class UlidTest extends TestCase
     public function testFormat(): void
     {
         $ulid = new Ulid();
-        
+
         // ULID文字列
         $this->myAssertMatchesRegularExpression('/^[0-9A-Z]{26}$/', $ulid->toString());
         $this->myAssertMatchesRegularExpression('/^[0-9A-Z]{26}$/', (string)$ulid);
 
         // UUID形式で出力
-        $this->assertTrue( $this->isUuidFormat($ulid->toUuid()));
-        
+        $this->assertTrue($this->isUuidFormat($ulid->toUuid()));
+
         // 16進数で出力
         $this->myAssertMatchesRegularExpression('/^[0-9a-f]+$/', $ulid->toHex());
     }
@@ -79,7 +80,8 @@ class UlidTest extends TestCase
      * @test
      * @testdox 生成したULIDオブジェクトから時間を取得し、生成した時間におおよそ一致することを確認
      */
-    public function testGetTime(): void {
+    public function testGetTime(): void
+    {
         // 現在時刻をマイクロ秒の数値型で取得
         $now = microtime(true);
         $ulid = new Ulid();
@@ -94,9 +96,10 @@ class UlidTest extends TestCase
      * @testdox ULID文字列からオブジェクトを生成し、UUID形式の文字列を取得
      * @dataProvider fromParams
      */
-    public function testFromUlid( string $ulid_str, string $uuid_str, string $timestamp_str ): void {
+    public function testFromUlid(string $ulid_str, string $uuid_str, string $timestamp_str): void
+    {
 
-        $ulid = Ulid::from( $ulid_str );
+        $ulid = Ulid::from($ulid_str);
         // UUIDが一致していることを確認
         $this->assertEquals(strtolower($uuid_str), strtolower($ulid->toUuid()));
 
@@ -111,8 +114,9 @@ class UlidTest extends TestCase
      * @testdox UUID文字列からオブジェクトを生成し、ULID形式の文字列を取得
      * @dataProvider fromParams
      */
-    public function testFromUuid( string $ulid_str, string $uuid_str, string $timestamp_str ): void {
-        $ulid = Ulid::from( $uuid_str );
+    public function testFromUuid(string $ulid_str, string $uuid_str, string $timestamp_str): void
+    {
+        $ulid = Ulid::from($uuid_str);
         // ULIDが一致していることを確認
         $this->assertEquals($ulid_str, $ulid->toString());
         $this->assertEquals($ulid_str, (string)$ulid);
@@ -122,17 +126,18 @@ class UlidTest extends TestCase
         // 時間も一致することを確認
         $this->assertEquals(sprintf('%.3f', $timestamp), sprintf('%.3f', $ulid->getTime()));
     }
-    
+
     /**
      * @test
      * @testdox 16進数文字列からオブジェクトを生成し、ULID形式の文字列とUUID形式の文字列を取得
      * @dataProvider fromParams
      */
-    public function testFromHex( string $ulid_str, string $uuid_str, string $timestamp_str ): void {
+    public function testFromHex(string $ulid_str, string $uuid_str, string $timestamp_str): void
+    {
         // $uuid_strのハイフンを削除
         $hex = str_replace('-', '', $uuid_str);
 
-        $ulid = Ulid::from( $hex );
+        $ulid = Ulid::from($hex);
         // ULIDが一致していることを確認
         $this->assertEquals($ulid_str, $ulid->toString());
         $this->assertEquals($ulid_str, (string)$ulid);
@@ -140,7 +145,8 @@ class UlidTest extends TestCase
         $this->assertEquals(strtolower($uuid_str), strtolower($ulid->toUuid()));
     }
 
-    public static function fromParams(): array {
+    public static function fromParams(): array
+    {
         return [
             // [ ULID文字列, UUID文字列, 時間文字列 ]
             ['01HVK10KGQMF83JMCQ0KHK5PG6', '018EE610-4E17-A3D0-3951-9704E332DA06', '2024-04-16T08:40:12.055Z' ],
@@ -158,27 +164,28 @@ class UlidTest extends TestCase
      * @test
      * @testdox ULID文字列が不正な場合に例外が発生することを確認
      * @dataProvider fromValueUlidParams
-     * @param string $ulid_str 
+     * @param string $ulid_str
      */
-    public function testFromValueUlid( string $ulid_str, bool $is_valid ): void {
+    public function testFromValueUlid(string $ulid_str, bool $is_valid): void
+    {
         try {
-            Ulid::from( $ulid_str );
+            Ulid::from($ulid_str);
             $this->assertTrue($is_valid);
-        }
-        catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->assertFalse($is_valid);
             $this->assertEquals('Invalid ULID format.', $e->getMessage());
         }
     }
 
-    public static function fromValueUlidParams(): array{
+    public static function fromValueUlidParams(): array
+    {
         // ここでは文字列の長さが26文字のものを対象とする
         return [
             // [ ULID文字列, ULID文字列として有効かどうか ]
             ["00000000000000000000000000", true],
             ["7ZZZZZZZZZZZZZZZZZZZZZZZZZ", true], // max
             ["01HVK10KGQMF83JMCQ0KHK5PG6", true],
-            
+
             // ULIDは小文字でもOK
             ["7zzzzzzzzzzzzzzzzzzzzzzzzz", true],
             ["01hvk10kgqmf83jmcq0khk5pg6", true],
@@ -199,20 +206,21 @@ class UlidTest extends TestCase
      * @testdox UUID文字列が不正な場合に例外が発生することを確認
      * @dataProvider fromValueUuidParams
      * @param string $uuid
-     * @return void 
+     * @return void
      */
-    public function testFromValueUuid( string $uuid, bool $is_valid ): void {
+    public function testFromValueUuid(string $uuid, bool $is_valid): void
+    {
         try {
-            Ulid::from( $uuid );
+            Ulid::from($uuid);
             $this->assertTrue($is_valid);
-        }
-        catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->assertFalse($is_valid);
             $this->assertEquals('Invalid UUID format.', $e->getMessage());
         }
     }
 
-    public static function fromValueUuidParams(): array{
+    public static function fromValueUuidParams(): array
+    {
         // ここでは文字列の長さが36文字のものを対象とする
         return [
             // [ UUID文字列, UUID文字列として有効かどうか ]
@@ -238,21 +246,22 @@ class UlidTest extends TestCase
      * @test
      * @testdox 16進数文字列が不正な場合に例外が発生することを確認
      * @dataProvider fromValueHexParams
-     * @param string $hex 
-     * @param bool $is_valid 
+     * @param string $hex
+     * @param bool $is_valid
      */
-    public function testFromValueHex( string $hex, bool $is_valid ): void {
+    public function testFromValueHex(string $hex, bool $is_valid): void
+    {
         try {
-            Ulid::from( $hex );
+            Ulid::from($hex);
             $this->assertTrue($is_valid);
-        }
-        catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->assertFalse($is_valid);
             $this->assertEquals('Invalid hex format.', $e->getMessage());
         }
     }
 
-    public static function fromValueHexParams(): array{
+    public static function fromValueHexParams(): array
+    {
         return [
             ["00000000000000000000000000000000", true],
             ["0x00000000000000000000000000000000", true],
@@ -283,7 +292,7 @@ class UlidTest extends TestCase
             // `0x`を除いた文字数が33文字(32より大きい)の場合はNG
             ["000000000000000000000000000000000", false],
             ["0x000000000000000000000000000000000", false],
-            
+
         ];
     }
 
@@ -292,39 +301,41 @@ class UlidTest extends TestCase
      * - 使用されている文字は16進数またはハイフン
      * - ハイフンの位置
      * - 文字数
-     * @param string $uuid 
+     * @param string $uuid
      * @return bool UUIDのフォーマットであればtrue
      */
-    private function isUuidFormat( string $uuid ): bool {
+    private function isUuidFormat(string $uuid): bool
+    {
         $pattern = '/^([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})$/';
         return preg_match($pattern, $uuid) === 1;
     }
 
     /**
      * `2024-04-16T08:40:12.055Z`のような書式の文字列をUNIXタイムスタンプ(小数点以下3桁)のfloat型に変換
-     * @param string $timestamp 
+     * @param string $timestamp
      * @return float UNIXタイムスタンプ(小数点以下3桁)
      */
-    private function timestampStrToFloat( string $timestamp ): float {
+    private function timestampStrToFloat(string $timestamp): float
+    {
         // 小数点以下を抽出し、$timestampにプラスして返す
         preg_match('/\.\d+/', $timestamp, $matches);
         return strtotime($timestamp) + (float)("0." . substr($matches[0], 1));
     }
-    
+
 
     /**
      * assertMatchesRegularExpressionのラッパー
      * PHPUnitのバージョンによってはassertMatchesRegularExpressionが存在しないため、その場合はpreg_matchを使って判定します
-     * @param string $pattern 
-     * @param string $string 
-     * @param string $message 
+     * @param string $pattern
+     * @param string $string
+     * @param string $message
      */
     private function myAssertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
     {
         if (method_exists($this, 'assertMatchesRegularExpression')) {
             $this->assertMatchesRegularExpression($pattern, $string, $message);
         } else {
-            $this->assertTrue( preg_match($pattern, $string) === 1, $message );
+            $this->assertTrue(preg_match($pattern, $string) === 1, $message);
         }
     }
 }
