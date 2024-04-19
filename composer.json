@@ -1,5 +1,5 @@
 {
-    "name": "yutayamane/php-ulid",
+    "name": "yutayamane/ulid",
     "description": "ULID library",
     "license": "MIT",
     "autoload": {
