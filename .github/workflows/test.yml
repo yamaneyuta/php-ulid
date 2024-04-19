@@ -18,6 +18,7 @@ jobs:
     strategy:
       matrix:
         env: [
+          { os: ubuntu-22.04, php-versions: '7.0' },
           { os: ubuntu-22.04, php-versions: '7.1' },
           { os: ubuntu-22.04, php-versions: '7.2' },
           { os: ubuntu-22.04, php-versions: '7.3' },

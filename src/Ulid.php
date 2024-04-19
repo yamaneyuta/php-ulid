@@ -9,9 +9,9 @@ class Ulid
     /** @var array */
     private $ulid_bytes;
 
-    private const ULID_CHARS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+    const ULID_CHARS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
-    public function __construct(?array $ulid_bytes = null)
+    public function __construct(array $ulid_bytes = null)
     {
 
         if (is_null($ulid_bytes)) {

@@ -12,7 +12,7 @@ class UlidTest extends TestCase
      * @test
      * @testdox `ulid()`関数が呼び出されたときに、ULIDフォーマットの文字列が返却されることを確認
      */
-    public function testUlidFunction(): void
+    public function testUlidFunction()
     {
         $this->myAssertMatchesRegularExpression('/^[0-9A-Z]{26}$/', ulid());
     }
@@ -21,7 +21,7 @@ class UlidTest extends TestCase
      * @test
      * @testdox 何回か`ulid()`関数を呼び出して、生成されるULIDが重複しないことを確認
      */
-    public function testUlidDuplicate(): void
+    public function testUlidDuplicate()
     {
         $ulid_list = array();
         // 1万回繰り返して重複する値が生成されないことを確認
@@ -41,7 +41,7 @@ class UlidTest extends TestCase
      * @testdox 出力される文字列のフォーマットチェック
      * @dataProvider fromParams
      */
-    public function testFormat(): void
+    public function testFormat()
     {
         $ulid = new Ulid();
 
@@ -62,7 +62,7 @@ class UlidTest extends TestCase
      * 生成したULIDオブジェクトから文字列を取得。その文字列を再度ULIDオブジェクトに戻し、そこから文字列を再取得。
      * 2つの文字列が一致することを確認
      */
-    public function testReconvert(): void
+    public function testReconvert()
     {
         $ulid = new Ulid();
 
@@ -80,7 +80,7 @@ class UlidTest extends TestCase
      * @test
      * @testdox 生成したULIDオブジェクトから時間を取得し、生成した時間におおよそ一致することを確認
      */
-    public function testGetTime(): void
+    public function testGetTime()
     {
         // 現在時刻をマイクロ秒の数値型で取得
         $now = microtime(true);
@@ -96,7 +96,7 @@ class UlidTest extends TestCase
      * @testdox ULID文字列からオブジェクトを生成し、UUID形式の文字列を取得
      * @dataProvider fromParams
      */
-    public function testFromUlid(string $ulid_str, string $uuid_str, string $timestamp_str): void
+    public function testFromUlid(string $ulid_str, string $uuid_str, string $timestamp_str)
     {
 
         $ulid = Ulid::from($ulid_str);
@@ -114,7 +114,7 @@ class UlidTest extends TestCase
      * @testdox UUID文字列からオブジェクトを生成し、ULID形式の文字列を取得
      * @dataProvider fromParams
      */
-    public function testFromUuid(string $ulid_str, string $uuid_str, string $timestamp_str): void
+    public function testFromUuid(string $ulid_str, string $uuid_str, string $timestamp_str)
     {
         $ulid = Ulid::from($uuid_str);
         // ULIDが一致していることを確認
@@ -132,7 +132,7 @@ class UlidTest extends TestCase
      * @testdox 16進数文字列からオブジェクトを生成し、ULID形式の文字列とUUID形式の文字列を取得
      * @dataProvider fromParams
      */
-    public function testFromHex(string $ulid_str, string $uuid_str, string $timestamp_str): void
+    public function testFromHex(string $ulid_str, string $uuid_str, string $timestamp_str)
     {
         // $uuid_strのハイフンを削除
         $hex = str_replace('-', '', $uuid_str);
@@ -166,7 +166,7 @@ class UlidTest extends TestCase
      * @dataProvider fromValueUlidParams
      * @param string $ulid_str
      */
-    public function testFromValueUlid(string $ulid_str, bool $is_valid): void
+    public function testFromValueUlid(string $ulid_str, bool $is_valid)
     {
         try {
             Ulid::from($ulid_str);
@@ -208,7 +208,7 @@ class UlidTest extends TestCase
      * @param string $uuid
      * @return void
      */
-    public function testFromValueUuid(string $uuid, bool $is_valid): void
+    public function testFromValueUuid(string $uuid, bool $is_valid)
     {
         try {
             Ulid::from($uuid);
@@ -249,7 +249,7 @@ class UlidTest extends TestCase
      * @param string $hex
      * @param bool $is_valid
      */
-    public function testFromValueHex(string $hex, bool $is_valid): void
+    public function testFromValueHex(string $hex, bool $is_valid)
     {
         try {
             Ulid::from($hex);
@@ -330,7 +330,7 @@ class UlidTest extends TestCase
      * @param string $string
      * @param string $message
      */
-    private function myAssertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
+    private function myAssertMatchesRegularExpression(string $pattern, string $string, string $message = '')
     {
         if (method_exists($this, 'assertMatchesRegularExpression')) {
             $this->assertMatchesRegularExpression($pattern, $string, $message);
