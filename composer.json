@@ -4,10 +4,10 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "yutayamane\\": "src/"
+            "yutayamane\\": "src/classes"
         },
         "files": [
-            "src/functions.php"
+            "src/functions/ulid.php"
         ]
     },
     "require": {
