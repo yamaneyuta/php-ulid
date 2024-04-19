@@ -333,6 +333,7 @@ class UlidTest extends TestCase
     private function myAssertMatchesRegularExpression(string $pattern, string $string, string $message = '')
     {
         if (method_exists($this, 'assertMatchesRegularExpression')) {
+            /** @disregard P1013 */
             $this->assertMatchesRegularExpression($pattern, $string, $message);
         } else {
             $this->assertTrue(preg_match($pattern, $string) === 1, $message);
