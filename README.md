@@ -2,7 +2,7 @@
 
 
 # php-ulid
-<img src="https://img.shields.io/badge/PHP-ccc.svg?logo=php&style=flat"> ![License](https://img.shields.io/github/license/yamaneyuta/php-ulid) ![Test](https://github.com/yamaneyuta/php-ulid/actions/workflows/test.yml/badge.svg?branch=main) ![Lint](https://github.com/yamaneyuta/php-ulid/actions/workflows/lint.yml/badge.svg?branch=main) ![Tested on PHP 7.1 to 8.3](https://img.shields.io/badge/tested%20on-PHP%207.0%20|%207.1%20|%207.2%20|%207.3%20|%207.4%20|%208.0%20|%208.1%20|%208.2%20|%208.3-brightgreen.svg?maxAge=2419200)
+<img src="https://img.shields.io/badge/PHP-ccc.svg?logo=php&style=flat"> <img alt="Packagist Version" src="https://img.shields.io/packagist/v/yamaneyuta/ulid"> ![License](https://img.shields.io/github/license/yamaneyuta/php-ulid) ![Lint](https://github.com/yamaneyuta/php-ulid/actions/workflows/lint.yml/badge.svg?branch=main) ![Test](https://github.com/yamaneyuta/php-ulid/actions/workflows/test.yml/badge.svg?branch=main) ![Tested on PHP 7.1 to 8.3](https://img.shields.io/badge/tested%20on-PHP%207.0%20|%207.1%20|%207.2%20|%207.3%20|%207.4%20|%208.0%20|%208.1%20|%208.2%20|%208.3-brightgreen.svg)
 
 PHPでULID(Universally Unique Lexicographically Sortable Identifier)を生成するためのライブラリです。
 
