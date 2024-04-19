@@ -22,17 +22,17 @@ composer require yamaneyuta/ulid
 
 新しくULIDを生成
 ```php
-use yamaneyuta\Ulid;
+use function yamaneyuta\ulid;
 
-echo (string)new Ulid(); // 01HVNE93FHMTQ38NSJ81M03H1Y
+echo ulid(); // 01HVTDK9CSD1F58S8YGK6M610X
 ```
 
 または
 
 ```php
-use function yamaneyuta\ulid;
+use yamaneyuta\Ulid;
 
-echo ulid(); // 01HVTDK9CSD1F58S8YGK6M610X
+echo (string)new Ulid(); // 01HVNE93FHMTQ38NSJ81M03H1Y
 ```
 
 他のフォーマットで出力
