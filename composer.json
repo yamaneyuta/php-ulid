@@ -20,7 +20,12 @@
     "scripts": {
         "coverage": "rm -rf reports && phpunit --testdox --coverage-html reports --coverage-clover=reports/clover.xml",
 		"format": "phpcbf --standard=PSR12 src tests",
-		"lint": "phpcs --standard=PSR12 src tests",
+		"lint": [
+            "@lint:php",
+            "@lint:phpcs"
+        ],
+        "lint:php": "find src tests -name '*.php' -exec php -l {} \\;",
+        "lint:phpcs": "phpcs",
         "test": "phpunit --testdox"
     }
 }
