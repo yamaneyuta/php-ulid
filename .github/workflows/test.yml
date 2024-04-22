@@ -1,12 +1,6 @@
 name: Test
 
-on:
-  push:
-    # `master`以外のブランチで実行。`master`ブランチは存在しないため、すべてのブランチで実行する。
-    # ※`branches`と`branches-ignore`の併用不可。
-    branches-ignore: [ "master" ]
-  pull_request:
-    branches-ignore: [ "master" ]
+on: [ push, pull_request ]
 
 permissions:
   contents: read
