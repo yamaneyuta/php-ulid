@@ -6,27 +6,109 @@ namespace yamaneyuta;
 
 class Ulid
 {
-    /** @var array */
+    /** @var int[] */
     private $ulid_bytes;
 
     const ULID_CHARS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
+    /** @var int */
+    private static $prev_time = 0;
+    /** @var int[]|null */
+    private static $prev_random = null;
+
+    /**
+     * @param int[]|null $ulid_bytes
+     */
     public function __construct(array $ulid_bytes = null)
     {
+        $this->init($ulid_bytes);
+    }
 
-        if (is_null($ulid_bytes)) {
+    /**
+     * インスタンスの初期化処理を行います。
+     * @param int[]|null $ulid_bytes
+     * @return void
+     */
+    private function init(array $ulid_bytes = null)
+    {
+        $this->ulid_bytes = is_null($ulid_bytes) ? $this->createNewUlidBytes() : $ulid_bytes;
+    }
+
+    /**
+     * ULIDのバイト配列を生成します。
+     * @return int[]
+     */
+    private function createNewUlidBytes(): array
+    {
+        // 現在時刻(ミリ秒単位)を取得
+        $time = $this->getCurrentTime();
+
+        if ($time === self::$prev_time) {
+            // 同一ミリ秒内での生成の場合は前回のランダム値をインクリメント
+            $random = $this->incrementBytes(self::$prev_random);
+        } else {
             // 下位10バイトのランダム値に相当する配列を作成
-            $ulid_bytes = unpack('C*', random_bytes(10));
+            $random = $this->createRandomBytes();
+        }
 
-            // ULIDの上位6バイトに現在の時間を格納
-            $time = (int) ( microtime(true) * 1000 );
-            for ($i = 5; $i >= 0; $i--) {
-                array_unshift($ulid_bytes, $time & 0xff);
-                $time >>= 8;
+        // static変数に今回の情報を保存
+        self::$prev_time = $time;
+        self::$prev_random = $random;
+
+        // ULIDの上位6バイトに現在の時間を格納
+        $ulid_bytes = $random;
+        for ($i = 5; $i >= 0; $i--) {
+            array_unshift($ulid_bytes, $time & 0xff);
+            $time >>= 8;
+        }
+
+        return $ulid_bytes;
+    }
+
+    /**
+     * 下位10バイトのランダム値に相当する配列を作成します。
+     * @return int[]
+     */
+    protected function createRandomBytes(): array
+    {
+        // 下位10バイトのランダム値に相当する配列を作成
+        // ※unpackはkeyが1開始の連想配列になっているため、array_valuesで配列に変換
+        return array_values(unpack('C*', random_bytes(10)));
+    }
+
+    /**
+     * 現在時刻(ミリ秒単位)を取得します。
+     * @return int ミリ秒で取得した現在時刻を1000倍し、小数点以下を切り捨てた整数値
+     */
+    protected function getCurrentTime(): int
+    {
+        return (int)(microtime(true) * 1000);
+    }
+
+    /**
+     * バイト配列をインクリメントします。
+     * @param int[] $bytes
+     * @return int[]
+     */
+    private function incrementBytes(array $bytes): array
+    {
+        $length = count($bytes);
+        // 最下位バイトをインクリメント
+        $bytes[ $length - 1 ] += 1;
+        // オーバーフロー処理
+        for ($i = $length - 1; $i > 0; $i--) {
+            if ($bytes[ $i ] > 0xff) {
+                $bytes[ $i ] = 0;
+                $bytes[ $i - 1 ] += 1;
             }
         }
 
-        $this->ulid_bytes = $ulid_bytes;
+        // 先頭バイトが0xffを超えた場合はエラー
+        if ($bytes[0] > 0xff) {
+            throw new \Exception('ULID increment overflow.');
+        }
+
+        return $bytes;
     }
 
     public function __toString(): string
