@@ -19,18 +19,20 @@ class UlidTest extends TestCase
 
     /**
      * @test
-     * @testdox 何回か`ulid()`関数を呼び出して、生成されるULIDが重複しないことを確認
+     * @testdox 何回か`ulid()`関数を呼び出して、生成されるULIDの値を確認
      */
     public function testUlidDuplicate()
     {
-        $ulid_list = array();
-        // 1万回繰り返して重複する値が生成されないことを確認
+        $prev_ulid = ulid();
+        // 1万回繰り返して必ず前回よりも大きいULIDが生成されることを確認(重複チェックも兼ねる)
         for ($i = 0; $i < 10000; $i++) {
-            $ulid_tmp = ulid();
-            if ($ulid_list[$ulid_tmp] ?? false) {
-                $this->fail('ULID is duplicated.');
+            $ulid = ulid();
+            if (!(strcmp($prev_ulid, $ulid) < 0)) {
+                // 文字列比較で前回よりも大きくない場合はエラー
+                error_log("prev: $prev_ulid, current: $ulid");
+                $this->fail();
             }
-            $ulid_list[$ulid_tmp] = true;
+            $prev_ulid = $ulid;
         }
 
         $this->assertTrue(true);
@@ -297,6 +299,99 @@ class UlidTest extends TestCase
     }
 
     /**
+     * @test
+     * @testdox 同一時刻で生成されたULIDが連番になっていることを確認
+     */
+    public function testMonotonicity()
+    {
+        // Mock対象のメソッドを指定してUlidのモックオブジェクトを取得
+        $methods = array("getCurrentTime", "createRandomBytes");
+        $ulid_mock = $this->getUlidMock($methods);
+
+        // getCurrentTimeは常に`0`を返す設定
+        $ulid_mock->expects($this->any())
+            ->method('getCurrentTime')
+            ->willReturn(0);
+
+        // createRandomBytesは`0`が10個の配列を返す設定
+        $ulid_mock->expects($this->once())
+            ->method('createRandomBytes')
+            ->willReturn(array_fill(0, 10, 0));
+
+        // コンストラクタの代わりにinit関数を呼び出してオブジェクトを初期化
+        $this->invokeInit($ulid_mock);
+
+        // 以降、Ulidオブジェクトとしてアクセス
+        /** @var Ulid $ulid_mock */
+
+        $ulid1 = $ulid_mock->toString();    // `00000000000000000000000000`
+
+        // 再度初期化。同一時間のため、過去のランダム値をインクリメントされた値が使用される
+        $this->invokeInit($ulid_mock);
+        $ulid2 = $ulid_mock->toString();    // `00000000000000000000000001`
+
+        $this->assertEquals('00000000000000000000000000', $ulid1);
+        $this->assertEquals('00000000000000000000000001', $ulid2);
+    }
+
+    /**
+     * @test
+     * @testdox ULIDのインクリメント処理でオーバーフローが発生する条件の時に例外が発生することを確認
+     * @return void
+     */
+    public function testMonotonicityOverflow()
+    {
+
+        // Mock対象のメソッドを指定してUlidのモックオブジェクトを取得
+        $methods = array("getCurrentTime", "createRandomBytes");
+        $ulid_mock = $this->getUlidMock($methods);
+
+        $time = 0x018F192E702A; // 適当な時間
+        // getCurrentTimeは常に同じ値を返す設定
+        $ulid_mock->expects($this->any())
+            ->method('getCurrentTime')
+            ->willReturn($time);
+
+
+        // createRandomBytesの戻り値は上位9バイトが`0xff`、下位1バイトが`0xfe`の配列
+        // ->初回生成はこの値が使用される。2回目はインクリメントされて最大値、3回目はオーバーフローとなる
+        $randomResult = array_fill(0, 9, 0xff);
+        $randomResult[] = 0xfe;
+
+        $ulid_mock->expects($this->once())
+            ->method('createRandomBytes')
+            ->willReturn($randomResult);
+
+        // コンストラクタの代わりにinit関数を呼び出してオブジェクトを初期化
+        $this->invokeInit($ulid_mock);
+
+        // 以降、Ulidオブジェクトとしてアクセス
+        /** @var Ulid $ulid_mock */
+
+        // ULID文字列からランダム部分だけ抽出する関数
+        $get_random_str = function (string $ulid) {
+            return substr($ulid, 10);
+        };
+
+        // 1回目の生成
+        $this->assertEquals('ZZZZZZZZZZZZZZZY', $get_random_str($ulid_mock->toString()));
+
+        // 2回目の生成
+        $this->invokeInit($ulid_mock);
+        $this->assertEquals('ZZZZZZZZZZZZZZZZ', $get_random_str($ulid_mock->toString()));
+
+        // 3回目の生成はオーバーフローのためエラーが発生する
+        $err = null;
+        try {
+            $this->invokeInit($ulid_mock);
+        } catch (\Exception $e) {
+            $err = $e;
+            $this->assertEquals('ULID increment overflow.', $e->getMessage());
+        }
+        $this->assertNotNull($err);
+    }
+
+    /**
      * 指定された文字列がUUID形式かどうかを判定
      * - 使用されている文字は16進数またはハイフン
      * - ハイフンの位置
@@ -338,5 +433,34 @@ class UlidTest extends TestCase
         } else {
             $this->assertTrue(preg_match($pattern, $string) === 1, $message);
         }
+    }
+
+    /**
+     * ULIDのモックオブジェクトを取得します。
+     * @param array $methods
+     */
+    private function getUlidMock(array $methods = array())
+    {
+        $builder = $this->getMockBuilder(Ulid::class)
+            ->disableOriginalConstructor();
+
+        /** @disregard P1013 */
+        $builder = method_exists($builder, 'onlyMethods')
+            ? $builder->onlyMethods($methods)
+            : $builder->setMethods($methods);
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $ulid_mock */
+        $ulid_mock = $builder->getMock();
+
+        return $ulid_mock;
+    }
+
+    private function invokeInit($ulid_mock)
+    {
+        // コンストラクタの代わりにinit関数を呼び出してオブジェクトを初期化
+        $reflection = new \ReflectionClass($ulid_mock);
+        $init_method = $reflection->getMethod('init');
+        $init_method->setAccessible(true);
+        $init_method->invoke($ulid_mock);
     }
 }
