@@ -19,7 +19,7 @@
     },
     "scripts": {
         "coverage": "rm -rf reports && phpunit --testdox --coverage-html reports --coverage-clover=reports/clover.xml",
-		"format": "phpcbf --standard=PSR12 src tests",
+		"format": "phpcbf",
 		"lint": [
             "@lint:php",
             "@lint:phpcs"
