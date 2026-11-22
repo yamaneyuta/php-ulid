@@ -315,8 +315,7 @@ class UlidTest extends TestCase
         $ulid_mock = $this->getUlidMock($methods);
 
         // getCurrentTimeは常に`0`を返す設定
-        $ulid_mock->expects($this->any())
-            ->method('getCurrentTime')
+        $ulid_mock->method('getCurrentTime')
             ->willReturn(0);
 
         // createRandomBytesは`0`が10個の配列を返す設定
@@ -354,8 +353,7 @@ class UlidTest extends TestCase
 
         $time = 0x018F192E702A; // 適当な時間
         // getCurrentTimeは常に同じ値を返す設定
-        $ulid_mock->expects($this->any())
-            ->method('getCurrentTime')
+        $ulid_mock->method('getCurrentTime')
             ->willReturn($time);
 
 
