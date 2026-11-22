@@ -14,6 +14,11 @@
 	"initializeCommand": "mkdir -p ~/.pi",
 
 	"postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
+	
+	"remoteEnv": {
+		// 事前にホスト側での環境変数設定が必要
+		"CLAUDE_CODE_ROUTER_API_KEY": "${localEnv:CLAUDE_CODE_ROUTER_API_KEY}"
+	},
 
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
