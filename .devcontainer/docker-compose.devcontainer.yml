@@ -11,6 +11,10 @@ services:
     #   context: .
     #   dockerfile: .devcontainer/Dockerfile
 
+    environment:
+      LANG: ${LANG:-ja_JP.UTF-8}
+      GIT_EDITOR: ${GIT_EDITOR:-code --wait}
+
     volumes:
       # Update this to wherever you want VS Code to mount the folder of your project
       # - ..:/workspaces:cached
