@@ -11,7 +11,7 @@
 	],
 	// コンテナ起動前にホスト側のディレクトリを作成
 	// （Docker が root 所有で自動作成するのを防止）
-	"initializeCommand": "mkdir -p ~/.pi",
+	"initializeCommand": "mkdir -p ~/.config/gh ~/.pi",
 
 	"postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
 	
