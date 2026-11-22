@@ -10,7 +10,7 @@ RUN apt update && \
     apt-get install software-properties-common -y && \
     add-apt-repository ppa:ondrej/php -y && \
     apt update && \
-    apt install php7.0 php7.0-dom php7.0-zip php7.0-dev php8.4-cli php8.4-xml php8.4-mbstring git unzip sudo curl -y && \
+    apt install php7.0 php7.0-dom php7.0-zip php7.0-dev php8.4-cli php8.4-xml php8.4-mbstring git unzip sudo curl xclip -y && \
     \
     php -r "copy('https://xdebug.org/files/xdebug-2.8.1.tgz', 'xdebug-2.8.1.tgz');" && \
     tar -xvzf xdebug-2.8.1.tgz && \
