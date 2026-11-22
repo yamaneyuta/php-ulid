@@ -15,8 +15,16 @@ install_global_npm_packages() {
     echo "pi: $(pi --version 2>/dev/null || true)"
 }
 
+configure_git() {
+    git config --global rebase.autoSquash true
+    git config --global rebase.autoStash true
+    git config --global rerere.enabled true
+    git config --global fetch.prune true
+}
+
 main() {
     install_vendor
     install_global_npm_packages
+    configure_git
 }
 main
