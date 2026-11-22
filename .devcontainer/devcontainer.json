@@ -9,7 +9,11 @@
 		"docker-compose.yml",
 		"docker-compose.devcontainer.yml"
 	],
-	"postCreateCommand": "composer install",
+	// コンテナ起動前にホスト側のディレクトリを作成
+	// （Docker が root 所有で自動作成するのを防止）
+	"initializeCommand": "mkdir -p ~/.pi",
+
+	"postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
 
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
