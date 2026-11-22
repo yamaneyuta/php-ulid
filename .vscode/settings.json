@@ -1,3 +1,6 @@
 {
-	"git.autorefresh": true
+	"git.autorefresh": true,
+	"files.exclude": {
+		"**/.phpunit.result.cache": true
+	}
 }
