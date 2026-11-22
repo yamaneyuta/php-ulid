@@ -66,10 +66,10 @@ push はユーザーの明示的な承認を得てから実行する（AGENTS.md
 
 ## 5. Packagist への反映確認
 
-push から数十秒〜数分で反映される。Packagist 側のキャッシュにより、反映後もしばらく古い参照が返ることがある。
+push から数十秒〜数分で反映される。反映後もしばらく古い参照が返るのは CDN のキャッシュのためで、`Cache-Control: no-cache` は効かないので URL にクエリを付ける。
 
 ```bash
-curl -s https://packagist.org/packages/yamaneyuta/ulid.json \
+curl -s "https://packagist.org/packages/yamaneyuta/ulid.json?cb=$(date +%s)" \
   | python3 -c 'import json,sys; [print(k, v["source"]["reference"]) for k, v in json.load(sys.stdin)["package"]["versions"].items()]'
 ```
 
