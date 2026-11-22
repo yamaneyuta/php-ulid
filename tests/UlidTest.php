@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace yamaneyuta;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class UlidTest extends TestCase
@@ -41,7 +42,6 @@ class UlidTest extends TestCase
     /**
      * @test
      * @testdox 出力される文字列のフォーマットチェック
-     * @dataProvider fromParams
      */
     public function testFormat()
     {
@@ -98,6 +98,7 @@ class UlidTest extends TestCase
      * @testdox ULID文字列からオブジェクトを生成し、UUID形式の文字列を取得
      * @dataProvider fromParams
      */
+    #[DataProvider('fromParams')]
     public function testFromUlid(string $ulid_str, string $uuid_str, string $timestamp_str)
     {
 
@@ -116,6 +117,7 @@ class UlidTest extends TestCase
      * @testdox UUID文字列からオブジェクトを生成し、ULID形式の文字列を取得
      * @dataProvider fromParams
      */
+    #[DataProvider('fromParams')]
     public function testFromUuid(string $ulid_str, string $uuid_str, string $timestamp_str)
     {
         $ulid = Ulid::from($uuid_str);
@@ -134,6 +136,7 @@ class UlidTest extends TestCase
      * @testdox 16進数文字列からオブジェクトを生成し、ULID形式の文字列とUUID形式の文字列を取得
      * @dataProvider fromParams
      */
+    #[DataProvider('fromParams')]
     public function testFromHex(string $ulid_str, string $uuid_str, string $timestamp_str)
     {
         // $uuid_strのハイフンを削除
@@ -168,6 +171,7 @@ class UlidTest extends TestCase
      * @dataProvider fromValueUlidParams
      * @param string $ulid_str
      */
+    #[DataProvider('fromValueUlidParams')]
     public function testFromValueUlid(string $ulid_str, bool $is_valid)
     {
         try {
@@ -210,6 +214,7 @@ class UlidTest extends TestCase
      * @param string $uuid
      * @return void
      */
+    #[DataProvider('fromValueUuidParams')]
     public function testFromValueUuid(string $uuid, bool $is_valid)
     {
         try {
@@ -251,6 +256,7 @@ class UlidTest extends TestCase
      * @param string $hex
      * @param bool $is_valid
      */
+    #[DataProvider('fromValueHexParams')]
     public function testFromValueHex(string $hex, bool $is_valid)
     {
         try {
