@@ -60,6 +60,8 @@ gh release create v1.1.0 --notes-file <(awk '/^## \[1\.1\.0\]/{f=1;next} /^## \[
 
 タグは main の push より後に push する。タグが参照するコミットがリモートに存在しないと Packagist が取得できない。
 
+タグ名は `.husky/pre-push` が検証し、セマンティックバージョン（`vX.Y.Z`）以外のタグは push が拒否される。
+
 push はユーザーの明示的な承認を得てから実行する（AGENTS.md 参照）。
 
 `--generate-notes` は PR のマージを前提に GitHub が本文を生成するため、main への直接コミットが中心の本リポジトリでは Full Changelog のリンクのみになる。そのため `CHANGELOG.md` の内容を `--notes-file` で渡す。
