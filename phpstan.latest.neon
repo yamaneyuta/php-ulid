@@ -1,0 +1,6 @@
+includes:
+    - phpstan.neon
+
+parameters:
+    # 最大サポートの PHP 8.3 として解析
+    phpVersion: 80300

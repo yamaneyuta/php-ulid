@@ -1,0 +1,7 @@
+includes:
+    - phpstan.neon
+
+parameters:
+    # PHPStan は 7.1 以上しか指定できないため最小サポートの PHP 7.0 の代わりに 7.1 を指定する
+    # （PHP 7.0 の構文チェックは lint:php の php -l が担保）
+    phpVersion: 70100

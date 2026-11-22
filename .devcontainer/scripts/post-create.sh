@@ -9,6 +9,10 @@ install_vendor() {
     composer install
 }
 
+install_phpstan() {
+    bash tools/install-phpstan.sh
+}
+
 # npm パッケージのインストール
 install_global_npm_packages() {
     sudo npm install -g --ignore-scripts @earendil-works/pi-coding-agent
@@ -24,6 +28,7 @@ configure_git() {
 
 main() {
     install_vendor
+    install_phpstan
     install_global_npm_packages
     configure_git
 }

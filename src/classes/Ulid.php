@@ -43,7 +43,7 @@ class Ulid
         // 現在時刻(ミリ秒単位)を取得
         $time = $this->getCurrentTime();
 
-        if ($time === self::$prev_time) {
+        if ($time === self::$prev_time && self::$prev_random !== null) {
             // 同一ミリ秒内での生成の場合は前回のランダム値をインクリメント
             $random = $this->incrementBytes(self::$prev_random);
         } else {
@@ -71,9 +71,7 @@ class Ulid
      */
     protected function createRandomBytes(): array
     {
-        // 下位10バイトのランダム値に相当する配列を作成
-        // ※unpackはkeyが1開始の連想配列になっているため、array_valuesで配列に変換
-        return array_values(unpack('C*', random_bytes(10)));
+        return self::toByteArray(random_bytes(10));
     }
 
     /**
@@ -109,6 +107,15 @@ class Ulid
         }
 
         return $bytes;
+    }
+
+    /**
+     * @param string $value バイナリ文字列
+     * @return int[]
+     */
+    private static function toByteArray(string $value): array
+    {
+        return array_map('ord', str_split($value));
     }
 
     public function __toString(): string
@@ -249,6 +256,10 @@ class Ulid
         if (! preg_match('/^[0-9a-f]{32}$/', strtolower($value))) {
             throw new \Exception('Invalid hex format.');
         }
-        return new self(array_map('ord', str_split(hex2bin($value))));
+        $bytes = hex2bin($value);
+        if (false === $bytes) {
+            throw new \Exception('Invalid hex format.');
+        }
+        return new self(self::toByteArray($bytes));
     }
 }

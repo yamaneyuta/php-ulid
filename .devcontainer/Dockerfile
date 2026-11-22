@@ -10,7 +10,7 @@ RUN apt update && \
     apt-get install software-properties-common -y && \
     add-apt-repository ppa:ondrej/php -y && \
     apt update && \
-    apt install php7.0 php7.0-dom php7.0-zip php7.0-dev git unzip sudo curl -y && \
+    apt install php7.0 php7.0-dom php7.0-zip php7.0-dev php8.3-cli php8.3-xml php8.3-mbstring git unzip sudo curl -y && \
     \
     php -r "copy('https://xdebug.org/files/xdebug-2.8.1.tgz', 'xdebug-2.8.1.tgz');" && \
     tar -xvzf xdebug-2.8.1.tgz && \
@@ -25,6 +25,10 @@ RUN apt update && \
     apt-get autoremove --purge software-properties-common -y && \
     apt autoremove --purge php7.0-dev -y && \
     apt clean && rm -rf /var/lib/apt/lists/*
+
+# PHPStan の実行には PHP 7.4 以上が必要なため php8.3 を併用する
+# php8.3 のインストールにより update-alternatives の既定が 8.3 になるため、開発用の既定は最小サポートの 7.0 に戻す
+RUN update-alternatives --set php /usr/bin/php7.0
 
 # Composer `Latest 2.2.x LTS` をインストール
 RUN php -r "copy('https://getcomposer.org/download/latest-2.2.x/composer.phar', '/usr/local/bin/composer');" && \

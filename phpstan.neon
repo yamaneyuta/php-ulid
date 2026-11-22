@@ -1,0 +1,5 @@
+parameters:
+    # tests は phpunit のバージョン間でスタブが異なり解析結果が不安定になるため対象外
+    paths:
+        - src
+    level: max
