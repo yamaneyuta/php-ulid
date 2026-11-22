@@ -472,14 +472,21 @@ class UlidTest extends TestCase
 
         // 時刻はstaticな$prev_timeがテスト間で共有されるため、他のテストと重ならない値を用いる
         $time = 0x018F192E7040;
+        // onConsecutiveCalls() は PHPUnit のバージョン間で提供状況が異なるため、コールバックで連続返却する
+        $times = array($time, $time + 1);
         // getCurrentTimeは呼び出しごとに時刻が進む設定
         $ulid_mock->method('getCurrentTime')
-            ->will($this->onConsecutiveCalls($time, $time + 1));
+            ->willReturnCallback(function () use (&$times) {
+                return array_shift($times);
+            });
 
         // createRandomBytesは時刻が進むたびに新規に呼び出される(連番ではなく新規ランダムが使われる)
+        $random_results = array(array_fill(0, 10, 0), array_merge(array_fill(0, 9, 0), array(0x01)));
         $ulid_mock->expects($this->exactly(2))
             ->method('createRandomBytes')
-            ->will($this->onConsecutiveCalls(array_fill(0, 10, 0), array_merge(array_fill(0, 9, 0), array(0x01))));
+            ->willReturnCallback(function () use (&$random_results) {
+                return array_shift($random_results);
+            });
 
         // コンストラクタの代わりにinit関数を呼び出してオブジェクトを初期化
         $this->invokeInit($ulid_mock);
@@ -671,7 +678,10 @@ class UlidTest extends TestCase
         // コンストラクタの代わりにinit関数を呼び出してオブジェクトを初期化
         $reflection = new \ReflectionClass($ulid_mock);
         $init_method = $reflection->getMethod('init');
-        $init_method->setAccessible(true);
+        // setAccessible() は PHP 8.1 以降効果がなく PHP 8.5 で非推奨のため、必要な PHP 7 系でのみ呼び出す
+        if (PHP_VERSION_ID < 80100) {
+            $init_method->setAccessible(true);
+        }
         $init_method->invoke($ulid_mock);
     }
 }

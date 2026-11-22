@@ -6,20 +6,20 @@ namespace yamaneyuta;
 
 class Ulid
 {
-    /** @var int[] */
+    /** @var int<0, 255>[] */
     private $ulid_bytes;
 
     const ULID_CHARS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
     /** @var int */
     private static $prev_time = 0;
-    /** @var int[]|null */
+    /** @var int<0, 255>[]|null */
     private static $prev_random = null;
 
     /**
      * 最小サポートが PHP 7.0 のため明示的な null 許容型(?array)が使えず、
      * 代わりに暗黙的に null 許容な構文(array $x = null)は PHP 8.4 で非推奨のため、型は PHPDoc で表現する。
-     * @param int[]|null $ulid_bytes
+     * @param int<0, 255>[]|null $ulid_bytes
      */
     public function __construct($ulid_bytes = null)
     {
@@ -28,7 +28,7 @@ class Ulid
 
     /**
      * インスタンスの初期化処理を行います。
-     * @param int[]|null $ulid_bytes
+     * @param int<0, 255>[]|null $ulid_bytes
      * @return void
      */
     private function init($ulid_bytes = null)
@@ -38,7 +38,7 @@ class Ulid
 
     /**
      * ULIDのバイト配列を生成します。
-     * @return int[]
+     * @return int<0, 255>[]
      */
     private function createNewUlidBytes(): array
     {
@@ -69,7 +69,7 @@ class Ulid
 
     /**
      * 下位10バイトのランダム値に相当する配列を作成します。
-     * @return int[]
+     * @return int<0, 255>[]
      */
     protected function createRandomBytes(): array
     {
@@ -87,33 +87,29 @@ class Ulid
 
     /**
      * バイト配列をインクリメントします。
-     * @param int[] $bytes
-     * @return int[]
+     * @param int<0, 255>[] $bytes
+     * @return int<0, 255>[]
      */
     private function incrementBytes(array $bytes): array
     {
-        $length = count($bytes);
-        // 最下位バイトをインクリメント
-        $bytes[ $length - 1 ] += 1;
-        // オーバーフロー処理
-        for ($i = $length - 1; $i > 0; $i--) {
-            if ($bytes[ $i ] > 0xff) {
+        for ($i = count($bytes) - 1; $i >= 0; $i--) {
+            $byte = $bytes[ $i ];
+            if ($byte === 0xff) {
+                // オーバーフローした桁は 0 にして上位桁へ繰り上げる
                 $bytes[ $i ] = 0;
-                $bytes[ $i - 1 ] += 1;
+                continue;
             }
+            $bytes[ $i ] = $byte + 1;
+            return $bytes;
         }
 
-        // 先頭バイトが0xffを超えた場合はエラー
-        if ($bytes[0] > 0xff) {
-            throw new \Exception('ULID increment overflow.');
-        }
-
-        return $bytes;
+        // 全ての桁からの繰り上げが発生した場合はエラー
+        throw new \Exception('ULID increment overflow.');
     }
 
     /**
      * @param string $value バイナリ文字列
-     * @return int[]
+     * @return int<0, 255>[]
      */
     private static function toByteArray(string $value): array
     {

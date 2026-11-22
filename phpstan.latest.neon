@@ -2,5 +2,5 @@ includes:
     - phpstan.neon
 
 parameters:
-    # 最大サポートの PHP 8.4 として解析
-    phpVersion: 80400
+    # 最大サポートの PHP 8.5 として解析
+    phpVersion: 80500
