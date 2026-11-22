@@ -204,7 +204,32 @@ class UlidTest extends TestCase
             ["I0000000000000000000000000", false],
             ["000000000000I0000000000000", false],
             ["0000000000000000000000000I", false],
+
+            // ULIDに含まれない文字`L``O``U`が入っている
+            ["L0000000000000000000000000", false],
+            ["0000000000000000000000000O", false],
+            ["0000000000000000000000000U", false],
+            // 小文字も同様に無効
+            ["l0000000000000000000000000", false],
+            ["0000000000000000000000000o", false],
+            ["0000000000000000000000000u", false],
+
+            // 大小文字混在のULID文字列
+            ["01hVk10KgQmF83jMcQ0kHk5pG6", true],
         ];
+    }
+
+    /**
+     * @test
+     * @testdox 大小文字混在のULID文字列からオブジェクトを生成したときに、出力される文字列が大文字に正規化されることを確認
+     */
+    public function testFromUlidMixedCase()
+    {
+        // fromUlid内で大文字に変換してからデコードするため、出力は大文字に正規化される
+        $ulid = Ulid::from('01hVk10KgQmF83jMcQ0kHk5pG6');
+
+        $this->assertEquals('01HVK10KGQMF83JMCQ0KHK5PG6', $ulid->toString());
+        $this->assertEquals('01HVK10KGQMF83JMCQ0KHK5PG6', (string)$ulid);
     }
 
     /**
@@ -306,6 +331,36 @@ class UlidTest extends TestCase
 
     /**
      * @test
+     * @testdox 32文字未満の16進数文字列からオブジェクトを生成したときに、左側が0で埋められた値になることを確認
+     * @dataProvider shortHexParams
+     * @param string $hex
+     * @param string $uuid
+     */
+    #[DataProvider('shortHexParams')]
+    public function testShortHexValue(string $hex, string $uuid)
+    {
+        $ulid = Ulid::from($hex);
+
+        // 32文字に足りない分は左側に0が埋められるため、指定した値が最下位桁に配置される
+        $this->assertEquals($uuid, $ulid->toUuid());
+    }
+
+    public static function shortHexParams(): array
+    {
+        return [
+            // [ 16進数文字列, 期待するUUID文字列 ]
+            ["0", "00000000-0000-0000-0000-000000000000"],
+            ["f", "00000000-0000-0000-0000-00000000000f"],
+            ["0xf", "00000000-0000-0000-0000-00000000000f"],
+            ["1234", "00000000-0000-0000-0000-000000001234"],
+            // 32文字に足りない1文字分が先頭に0埋めされる
+            ["fffffffffffffffffffffffffffffff", "0fffffff-ffff-ffff-ffff-ffffffffffff"],
+            ["0xfffffffffffffffffffffffffffffff", "0fffffff-ffff-ffff-ffff-ffffffffffff"],
+        ];
+    }
+
+    /**
+     * @test
      * @testdox 同一時刻で生成されたULIDが連番になっていることを確認
      */
     public function testMonotonicity()
@@ -341,6 +396,152 @@ class UlidTest extends TestCase
 
     /**
      * @test
+     * @testdox 同一時刻内の連番生成で、ランダム部の桁上がりが複数バイトにわたって行われることを確認
+     * @dataProvider multiByteCarryParams
+     * @param int $time
+     * @param int[] $random_bytes
+     * @param string $expected_random_str_1
+     * @param string $expected_random_str_2
+     */
+    #[DataProvider('multiByteCarryParams')]
+    public function testMonotonicityMultiByteCarry(
+        int $time,
+        array $random_bytes,
+        string $expected_random_str_1,
+        string $expected_random_str_2
+    ) {
+        // Mock対象のメソッドを指定してUlidのモックオブジェクトを取得
+        $methods = array("getCurrentTime", "createRandomBytes");
+        $ulid_mock = $this->getUlidMock($methods);
+
+        // getCurrentTimeは常に同じ値を返す設定
+        $ulid_mock->method('getCurrentTime')
+            ->willReturn($time);
+
+        // createRandomBytesは初回生成でのみ呼び出される設定
+        $ulid_mock->expects($this->once())
+            ->method('createRandomBytes')
+            ->willReturn($random_bytes);
+
+        // コンストラクタの代わりにinit関数を呼び出してオブジェクトを初期化
+        $this->invokeInit($ulid_mock);
+
+        // 以降、Ulidオブジェクトとしてアクセス
+        /** @var Ulid $ulid_mock */
+
+        // 1回目の生成
+        $this->assertEquals($expected_random_str_1, $this->randomPartOfUlid($ulid_mock->toString()));
+
+        // 2回目の生成。同一時刻のため前回値がインクリメントされ、下位バイトから上位バイトへ桁上がりする
+        $this->invokeInit($ulid_mock);
+        $this->assertEquals($expected_random_str_2, $this->randomPartOfUlid($ulid_mock->toString()));
+    }
+
+    public static function multiByteCarryParams(): array
+    {
+        // staticな$prev_time/$prev_randomはテスト間・データセット間で共有されるため、
+        // 時刻は各ケース・他テストと異なる値にして、実行順序に依存せず新規ランダムから始まるようにする
+        return [
+            // [ 時間, createRandomBytesの戻り値, 1回目のランダム部文字列, 2回目のランダム部文字列 ]
+            // 最下位2バイトにわたって桁上がりするケース(0x01ff -> 0x0200)
+            [
+                0x018F192E7030,
+                array_merge(array_fill(0, 8, 0), [0x01, 0xff]),
+                '00000000000000FZ',
+                '00000000000000G0',
+            ],
+            // 桁上がりが3バイトに連鎖するケース(0x01ffff -> 0x020000)
+            [
+                0x018F192E7031,
+                array_merge(array_fill(0, 7, 0), [0x01, 0xff, 0xff]),
+                '0000000000003ZZZ',
+                '0000000000004000',
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox 時刻が進んだ場合はランダム値を新規に生成することを確認
+     */
+    public function testNewRandomWhenTimeAdvanced()
+    {
+        // Mock対象のメソッドを指定してUlidのモックオブジェクトを取得
+        $methods = array("getCurrentTime", "createRandomBytes");
+        $ulid_mock = $this->getUlidMock($methods);
+
+        // 時刻はstaticな$prev_timeがテスト間で共有されるため、他のテストと重ならない値を用いる
+        $time = 0x018F192E7040;
+        // getCurrentTimeは呼び出しごとに時刻が進む設定
+        $ulid_mock->method('getCurrentTime')
+            ->will($this->onConsecutiveCalls($time, $time + 1));
+
+        // createRandomBytesは時刻が進むたびに新規に呼び出される(連番ではなく新規ランダムが使われる)
+        $ulid_mock->expects($this->exactly(2))
+            ->method('createRandomBytes')
+            ->will($this->onConsecutiveCalls(array_fill(0, 10, 0), array_merge(array_fill(0, 9, 0), array(0x01))));
+
+        // コンストラクタの代わりにinit関数を呼び出してオブジェクトを初期化
+        $this->invokeInit($ulid_mock);
+
+        // 以降、Ulidオブジェクトとしてアクセス
+        /** @var Ulid $ulid_mock */
+
+        // 1回目の生成
+        $this->assertEquals('0000000000000000', $this->randomPartOfUlid($ulid_mock->toString()));
+
+        // 2回目の生成。時刻が進んだためインクリメントではなく新規ランダムが使用される
+        $this->invokeInit($ulid_mock);
+        $this->assertEquals('0000000000000001', $this->randomPartOfUlid($ulid_mock->toString()));
+    }
+
+    /**
+     * @test
+     * @testdox 別インスタンス間でも同一時刻内の生成は連番になることを確認
+     */
+    public function testMonotonicityAcrossInstances()
+    {
+        // Mock対象のメソッドを指定してUlidのモックオブジェクトを取得
+        $methods = array("getCurrentTime", "createRandomBytes");
+
+        // 時刻はstaticな$prev_timeがテスト間で共有されるため、他のテストと重ならない値を用いる
+        $time = 0x018F192E7050;
+
+        $ulid_mock1 = $this->getUlidMock($methods);
+        $ulid_mock1->method('getCurrentTime')
+            ->willReturn($time);
+        $ulid_mock1->expects($this->once())
+            ->method('createRandomBytes')
+            ->willReturn(array_merge(array_fill(0, 9, 0), array(0x42)));
+
+        // コンストラクタの代わりにinit関数を呼び出してオブジェクトを初期化
+        $this->invokeInit($ulid_mock1);
+
+        // 以降、Ulidオブジェクトとしてアクセス
+        /** @var Ulid $ulid_mock1 */
+
+        $ulid1 = $ulid_mock1->toString();
+
+        $ulid_mock2 = $this->getUlidMock($methods);
+        $ulid_mock2->method('getCurrentTime')
+            ->willReturn($time);
+        // staticな前回ランダム値が引き継がれるため、2つ目のインスタンスではcreateRandomBytesが呼び出されない
+        $ulid_mock2->expects($this->never())
+            ->method('createRandomBytes');
+
+        $this->invokeInit($ulid_mock2);
+
+        /** @var Ulid $ulid_mock2 */
+
+        $ulid2 = $ulid_mock2->toString();
+
+        // 1つ目がランダム部0x42、2つ目は同一時刻のため前回値からインクリメントされた0x43になる
+        $this->assertEquals('01HWCJWW2G0000000000000022', $ulid1);
+        $this->assertEquals('01HWCJWW2G0000000000000023', $ulid2);
+    }
+
+    /**
+     * @test
      * @testdox ULIDのインクリメント処理でオーバーフローが発生する条件の時に例外が発生することを確認
      * @return void
      */
@@ -372,17 +573,12 @@ class UlidTest extends TestCase
         // 以降、Ulidオブジェクトとしてアクセス
         /** @var Ulid $ulid_mock */
 
-        // ULID文字列からランダム部分だけ抽出する関数
-        $get_random_str = function (string $ulid) {
-            return substr($ulid, 10);
-        };
-
         // 1回目の生成
-        $this->assertEquals('ZZZZZZZZZZZZZZZY', $get_random_str($ulid_mock->toString()));
+        $this->assertEquals('ZZZZZZZZZZZZZZZY', $this->randomPartOfUlid($ulid_mock->toString()));
 
         // 2回目の生成
         $this->invokeInit($ulid_mock);
-        $this->assertEquals('ZZZZZZZZZZZZZZZZ', $get_random_str($ulid_mock->toString()));
+        $this->assertEquals('ZZZZZZZZZZZZZZZZ', $this->randomPartOfUlid($ulid_mock->toString()));
 
         // 3回目の生成はオーバーフローのためエラーが発生する
         $err = null;
@@ -393,6 +589,17 @@ class UlidTest extends TestCase
             $this->assertEquals('ULID increment overflow.', $e->getMessage());
         }
         $this->assertNotNull($err);
+    }
+
+    /**
+     * ULID文字列からランダム部を抽出します
+     * @param string $ulid
+     * @return string 上位10文字の時間部を除いたランダム部の文字列
+     */
+    private function randomPartOfUlid(string $ulid): string
+    {
+        // 上位6バイト(48ビット)の時間部は5ビット単位のエンコードで10文字分に相当するため取り除く
+        return substr($ulid, 10);
     }
 
     /**
