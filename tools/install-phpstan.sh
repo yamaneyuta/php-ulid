@@ -6,4 +6,4 @@ PHPSTAN_VERSION='2.3.7'
 
 cd "$(dirname "$0")"
 curl -fsSL -o phpstan.phar "https://github.com/phpstan/phpstan/releases/download/${PHPSTAN_VERSION}/phpstan.phar"
-php8.3 phpstan.phar --version
+php8.4 phpstan.phar --version

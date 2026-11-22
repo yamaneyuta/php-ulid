@@ -17,9 +17,11 @@ class Ulid
     private static $prev_random = null;
 
     /**
+     * 最小サポートが PHP 7.0 のため明示的な null 許容型(?array)が使えず、
+     * 代わりに暗黙的に null 許容な構文(array $x = null)は PHP 8.4 で非推奨のため、型は PHPDoc で表現する。
      * @param int[]|null $ulid_bytes
      */
-    public function __construct(array $ulid_bytes = null)
+    public function __construct($ulid_bytes = null)
     {
         $this->init($ulid_bytes);
     }
@@ -29,7 +31,7 @@ class Ulid
      * @param int[]|null $ulid_bytes
      * @return void
      */
-    private function init(array $ulid_bytes = null)
+    private function init($ulid_bytes = null)
     {
         $this->ulid_bytes = is_null($ulid_bytes) ? $this->createNewUlidBytes() : $ulid_bytes;
     }
