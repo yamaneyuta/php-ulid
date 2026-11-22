@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         env: [
-          { os: ubuntu-22.04, php-versions: '7.0' },
-          { os: ubuntu-latest, php-versions: '8.6' },
+          { os: ubuntu-24.04, php-versions: '7.0' },
+          { os: ubuntu-24.04, php-versions: '8.6' },
         ]
 
     steps:
@@ -46,7 +46,7 @@ jobs:
 
   phpstan:
     name: PHPStan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v5
@@ -70,18 +70,18 @@ jobs:
     strategy:
       matrix:
         env: [
-          { os: ubuntu-22.04, php-versions: '7.0' },
-          { os: ubuntu-22.04, php-versions: '7.1' },
-          { os: ubuntu-22.04, php-versions: '7.2' },
-          { os: ubuntu-22.04, php-versions: '7.3' },
-          { os: ubuntu-22.04, php-versions: '7.4' },
-          { os: ubuntu-22.04, php-versions: '8.0' },
-          { os: ubuntu-22.04, php-versions: '8.1' },
-          { os: ubuntu-22.04, php-versions: '8.2' },
-          { os: ubuntu-latest, php-versions: '8.3' },
-          { os: ubuntu-latest, php-versions: '8.4' },
-          { os: ubuntu-latest, php-versions: '8.5' },
-          { os: ubuntu-latest, php-versions: '8.6' },
+          { os: ubuntu-24.04, php-versions: '7.0' },
+          { os: ubuntu-24.04, php-versions: '7.1' },
+          { os: ubuntu-24.04, php-versions: '7.2' },
+          { os: ubuntu-24.04, php-versions: '7.3' },
+          { os: ubuntu-24.04, php-versions: '7.4' },
+          { os: ubuntu-24.04, php-versions: '8.0' },
+          { os: ubuntu-24.04, php-versions: '8.1' },
+          { os: ubuntu-24.04, php-versions: '8.2' },
+          { os: ubuntu-24.04, php-versions: '8.3' },
+          { os: ubuntu-24.04, php-versions: '8.4' },
+          { os: ubuntu-24.04, php-versions: '8.5' },
+          { os: ubuntu-24.04, php-versions: '8.6' },
         ]
 
     steps:
