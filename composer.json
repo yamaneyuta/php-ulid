@@ -22,8 +22,8 @@
             "@analyse:legacy",
             "@analyse:latest"
         ],
-        "analyse:legacy": "php8.5 tools/phpstan.phar analyse --configuration phpstan.legacy.neon",
-        "analyse:latest": "php8.5 tools/phpstan.phar analyse --configuration phpstan.latest.neon",
+        "analyse:legacy": "php8.6 tools/phpstan.phar analyse --configuration phpstan.legacy.neon",
+        "analyse:latest": "php8.6 tools/phpstan.phar analyse --configuration phpstan.latest.neon",
         "coverage": "rm -rf reports && phpunit --testdox --coverage-html reports --coverage-clover=reports/clover.xml --whitelist src",
 		"format": "phpcbf",
 		"lint": [

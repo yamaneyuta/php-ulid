@@ -10,7 +10,7 @@ RUN apt update && \
     apt-get install software-properties-common -y && \
     add-apt-repository ppa:ondrej/php -y && \
     apt update && \
-    apt install php7.0 php7.0-dom php7.0-zip php7.0-dev php8.5-cli php8.5-xml php8.5-mbstring git unzip sudo curl xclip -y && \
+    apt install php7.0 php7.0-dom php7.0-zip php7.0-dev php8.6-cli php8.6-xml php8.6-mbstring git unzip sudo curl xclip -y && \
     \
     php -r "copy('https://xdebug.org/files/xdebug-2.8.1.tgz', 'xdebug-2.8.1.tgz');" && \
     tar -xvzf xdebug-2.8.1.tgz && \
@@ -26,8 +26,8 @@ RUN apt update && \
     apt autoremove --purge php7.0-dev -y && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
-# PHPStan の実行には PHP 7.4 以上が必要なため php8.5 を併用する
-# php8.5 のインストールにより update-alternatives の既定が 8.5 になるため、開発用の既定は最小サポートの 7.0 に戻す
+# PHPStan の実行には PHP 7.4 以上が必要なため php8.6 を併用する
+# php8.6 のインストールにより update-alternatives の既定が 8.6 になるため、開発用の既定は最小サポートの 7.0 に戻す
 RUN update-alternatives --set php /usr/bin/php7.0
 
 # Composer `Latest 2.2.x LTS` をインストール

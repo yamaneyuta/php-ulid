@@ -13,7 +13,7 @@ jobs:
       matrix:
         env: [
           { os: ubuntu-22.04, php-versions: '7.0' },
-          { os: ubuntu-latest, php-versions: '8.5' },
+          { os: ubuntu-latest, php-versions: '8.6' },
         ]
 
     steps:
@@ -51,10 +51,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Set up PHP 8.5
+      - name: Set up PHP 8.6
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.5'
+          php-version: '8.6'
           extensions: dom, mbstring
 
       - name: Install PHPStan
@@ -81,6 +81,7 @@ jobs:
           { os: ubuntu-latest, php-versions: '8.3' },
           { os: ubuntu-latest, php-versions: '8.4' },
           { os: ubuntu-latest, php-versions: '8.5' },
+          { os: ubuntu-latest, php-versions: '8.6' },
         ]
 
     steps:
